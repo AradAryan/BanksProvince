@@ -13,101 +13,80 @@ namespace BanksProvince
         /// <summary>
         /// Address of First File For Reading 
         /// </summary>
-        private static string firstDirectory = @"C:\Users\faranam\Desktop\AYN_BRNCH_971025.txt";
+        private static string firstDirectory =
+            @"C:\Users\faranam\Desktop\AYN_BRNCH_971025.txt";
 
         /// <summary>
         /// Address of Second File for Write Output
         /// </summary>
-        private static string secondDirectory = @"C:\Users\faranam\Desktop\Context1.txt";
+        private static string secondDirectory =
+            @"C:\Users\faranam\Desktop\Context1.txt";
 
         /// <summary>
         /// Context Of the First File
         /// </summary>
         public static string Context = File.ReadAllText(firstDirectory);
+
+        public static List<Banks> Banks = new List<Banks>();
         #endregion
 
         #region Order Function
         /// <summary>
         /// Change Order of Text
         /// </summary>
-        static private void Order()
+        static private void FillBanks()
         {
             string[] context = new string[File.ReadAllLines(firstDirectory).Length];
             context = File.ReadAllLines(firstDirectory);
             Banks bank = new Banks();
             List<Banks> banks = new List<Banks>();
             string[] temp = new string[9];
+            int arrayCount = 0;
             for (int i = 0; i < context.Length; i++)
             {
-                temp = null;
                 bank = new Banks();
-                temp = context[i].Split(',');
-                if (temp.Length >= 1)
-                    bank.BankCode = temp[0] + ", ";
-                if (temp.Length >= 2)
-                    bank.ProvinceCode = temp[1] + ", ";
-                if (temp.Length >= 3)
-                    bank.ProvinceName = temp[2] + ", ";
-                if (temp.Length >= 4)
-                    bank.CityCode = temp[3] + ", ";
-                if (temp.Length >= 5)
-                    bank.CityName = temp[4] + ", ";
-                if (temp.Length >= 6)
-                    bank.Branch = temp[5] + ", ";
-                if (temp.Length >= 7)
-                    bank.BranchName = temp[6] + ", ";
-                if (temp.Length >= 8)
-                    bank.Address = temp[7] + ", ";
-                if (temp.Length >= 9)
-                    bank.PostalCode = temp[8] + ", ";
+                arrayCount = context[i].Split(',').Length;
+                for (int j = 0; j < arrayCount; j++)
+                {
+                    temp[j] = context[i].Split(',')[j];
+                }
+                bank.BankCode = temp[0] + ",";
+                bank.ProvinceCode = temp[1] + ",";
+                bank.ProvinceName = temp[2] + ",";
+                bank.CityCode = temp[3] + ",";
+                bank.CityName = temp[4] + ",";
+                bank.Branch = temp[5] + ",";
+                bank.BranchName = temp[6] + ",";
+                bank.Address = temp[7] + ",";
+                bank.PostalCode = temp[8];
                 banks.Add(bank);
             }
-            IEnumerable<Banks> orderedList = 
-                banks.OrderBy(ProvinceName => ProvinceName.ProvinceName);
-
-            Banks[] bankArray =
-                new Banks[File.ReadAllLines(firstDirectory).Length];
-
-            bankArray = orderedList.ToArray();
-            int Province = 1;
-            string x = "";
-            string lastProvince;
-            string nowProvince;
-            foreach (var item in bankArray)
-            {
-                lastProvince = temp[0];
-
-                temp[4] = item.Branch;
-                temp[1] = item.BranchName;
-                temp[2] = item.BankCode;
-                temp[3] = item.ProvinceCode;
-                temp[0] = item.ProvinceName;
-                temp[5] = item.CityCode;
-                temp[6] = item.CityName;
-                temp[7] = item.PostalCode;
-                temp[8] = item.Address;
-
-                nowProvince = item.ProvinceName;
-                if (nowProvince.Contains(lastProvince))
-                {
-                    Province++;
-
-                }
-                else
-                {
-                    x = x.Insert(0, Environment.NewLine + 
-                        lastProvince + Province + Environment.NewLine);
-
-                    File.AppendAllText(secondDirectory, x);
-                    x = null;
-                    Province = 1;
-                }
-                x += temp[0] +  temp[1] + temp[2] + temp[3] + 
-                    temp[4] + temp[5] + temp[6] + temp[7] + temp[8] + Environment.NewLine;
-            }
+            Banks = banks;
         }
         #endregion
+        static private void Group()
+        {
+            var result = Banks.GroupBy(bank => bank.ProvinceName);
+            Context = null;
+            foreach (var item in result)
+            {
+                
+                Context += item.Key + item.Count() + Environment.NewLine;
+                foreach (var bank in item)
+                {
+                    Context +=  bank.BankCode + bank.ProvinceCode + bank.ProvinceName + bank.CityCode +
+                        bank.CityName + bank.Branch + bank.BranchName + bank.Address +bank.PostalCode + Environment.NewLine;
+                       
+                }
+            }
+        }
 
+        static private void WriteToFile(string path)
+        {
+            Stream file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
+            StreamWriter writer = new StreamWriter(file,encoding: UTF8Encoding.UTF8);
+            writer.Write(Context);
+        }
         #region Main Funtion
         /// <summary>
         /// Main Funtion
@@ -115,7 +94,9 @@ namespace BanksProvince
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            Order();
+            FillBanks();
+            Group();
+            WriteToFile(secondDirectory);
 
             Console.WriteLine("Jobs Done!");
             Console.ReadKey();
