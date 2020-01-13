@@ -25,7 +25,8 @@ namespace BanksProvince
         /// <summary>
         /// Context Of the First File
         /// </summary>
-        public static string Context = File.ReadAllText(firstDirectory);
+        public static string Context =
+            File.ReadAllText(firstDirectory);
 
         /// <summary>
         /// LINQ
@@ -78,17 +79,15 @@ namespace BanksProvince
             Context = null;
             foreach (var item in result)
             {
-
                 Context += item.Key + item.Count() + Environment.NewLine;
                 foreach (var bank in item)
                 {
                     Context += bank.BankCode + bank.ProvinceCode + bank.ProvinceName + bank.CityCode +
                         bank.CityName + bank.Branch + bank.BranchName + bank.Address + bank.PostalCode + Environment.NewLine;
-
                 }
             }
         }
-#endregion
+        #endregion
 
         #region WriteToFile Function
         /// <summary>
