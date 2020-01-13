@@ -27,6 +27,9 @@ namespace BanksProvince
         /// </summary>
         public static string Context = File.ReadAllText(firstDirectory);
 
+        /// <summary>
+        /// LINQ
+        /// </summary>
         public static List<Banks> Banks = new List<Banks>();
         #endregion
 
@@ -64,29 +67,42 @@ namespace BanksProvince
             Banks = banks;
         }
         #endregion
+
+        #region Group Function
+        /// <summary>
+        /// Insert Groups Province Name, Count
+        /// </summary>
         static private void Group()
         {
             var result = Banks.GroupBy(bank => bank.ProvinceName);
             Context = null;
             foreach (var item in result)
             {
-                
+
                 Context += item.Key + item.Count() + Environment.NewLine;
                 foreach (var bank in item)
                 {
-                    Context +=  bank.BankCode + bank.ProvinceCode + bank.ProvinceName + bank.CityCode +
-                        bank.CityName + bank.Branch + bank.BranchName + bank.Address +bank.PostalCode + Environment.NewLine;
-                       
+                    Context += bank.BankCode + bank.ProvinceCode + bank.ProvinceName + bank.CityCode +
+                        bank.CityName + bank.Branch + bank.BranchName + bank.Address + bank.PostalCode + Environment.NewLine;
+
                 }
             }
         }
+#endregion
 
+        #region WriteToFile Function
+        /// <summary>
+        /// Write Output Context to File with UTF8 Encoding
+        /// </summary>
+        /// <param name="path"></param>
         static private void WriteToFile(string path)
         {
             Stream file = new FileStream(path, FileMode.OpenOrCreate, FileAccess.Write);
-            StreamWriter writer = new StreamWriter(file,encoding: UTF8Encoding.UTF8);
+            StreamWriter writer = new StreamWriter(file, encoding: UTF8Encoding.UTF8);
             writer.Write(Context);
         }
+        #endregion
+
         #region Main Funtion
         /// <summary>
         /// Main Funtion
